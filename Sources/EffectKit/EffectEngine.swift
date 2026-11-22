@@ -190,6 +190,13 @@ public struct EffectEngine {
             if fuelPct < blinkBelow { o.playerBrightness = frame % 60 < 30 ? 0 : 2 }
         }
 
+        // ---- turn signals on the player LEDs: the lightbar is one colour, these five can show a side ----
+        if L.blinkerPlayerLEDs && t.engineEnabled
+            && (t.blinkerLeftActive || t.blinkerRightActive || t.hazardWarning || t.blinkerLeftOn || t.blinkerRightOn) {
+            o.playerLEDs = (t.blinkerLeftOn ? 0x03 : 0) | (t.blinkerRightOn ? 0x18 : 0)
+            o.playerBrightness = 0
+        }
+
         // ---- refuel chug ----
         if h.refuel.enabled && t.refuel {
             active.insert(.refuel)

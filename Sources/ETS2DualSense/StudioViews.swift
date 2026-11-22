@@ -273,6 +273,9 @@ struct LightingStudioView: View {
                     Spacer()
                     previewButton(.fuelGauge, "fuel gauge")
                 }
+                Toggle("Turn signals on the player LEDs", isOn: L.blinkerPlayerLEDs)
+                Text("The lightbar is a single colour and cannot show a side, so the left signal flashes the two left LEDs and the right signal the two right ones. The fuel gauge returns when the signal is off.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 Toggle("Warnings on the microphone LED", isOn: L.warningsMicLED)
                 Text("Mic LED pulses for oil pressure, coolant temperature, air pressure or heavy chassis damage; steady for AdBlue or battery warnings.")
                     .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)

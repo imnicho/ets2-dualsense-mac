@@ -39,6 +39,7 @@ checklist in PROGRESS.md is run.
 | Custom trigger curves, min/max, dead zone, smoothing, source selection | speed, RPM, effective pedal, deceleration | telemetry |
 | ABS pulse on L2 | wheel speed vs road speed, or hard-brake condition | **simulated** — ETS2 exposes no ABS channel |
 | Throttle release on gear change (R2 goes slack mid-shift) | gear number change | telemetry |
+| Turn signals per side on the player LEDs | indicator lamp and stalk state | telemetry |
 | Rev-limit buzz on R2 / rumble | RPM > 95 % of limit | telemetry |
 | Engine vibration, engine stop | RPM, engine state | telemetry |
 | Road surface | suspension deflection change + surface name | approximation |

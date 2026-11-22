@@ -136,6 +136,43 @@ final class EffectTests: XCTestCase {
         XCTAssertEqual(o.micLED, .on)
     }
 
+    func testTurnSignalsUseTheirSideOfThePlayerLEDs() {
+        var p = Profile.original
+        p.lighting.blinkerPlayerLEDs = true
+        var e = EffectEngine()
+        func leds(_ edit: @escaping (inout TruckState) -> Void) -> UInt8 { e.step(driving(edit), profile: p, now: 0).output.playerLEDs }
+        XCTAssertEqual(leds { $0.blinkerLeftActive = true; $0.blinkerLeftOn = true }, 0x03)
+        XCTAssertEqual(leds { $0.blinkerLeftActive = true }, 0)              // lamp in its off phase: no fuel gauge flicker
+        XCTAssertEqual(leds { $0.blinkerRightActive = true; $0.blinkerRightOn = true }, 0x18)
+        XCTAssertEqual(leds { $0.hazardWarning = true; $0.blinkerLeftOn = true; $0.blinkerRightOn = true }, 0x1b)
+        XCTAssertEqual(leds { _ in }, 0x1f)                                   // signal off: fuel gauge again
+        p.lighting.blinkerPlayerLEDs = false
+        XCTAssertEqual(leds { $0.blinkerLeftActive = true; $0.blinkerLeftOn = true }, 0x1f)
+    }
+
+    func testProfileFileFromOlderVersionKeepsItsSettings() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("ets2ds-\(UUID().uuidString)/profiles.json")
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        var custom = Profile(name: "Mine")
+        custom.brake.maxForce = 0.33
+        custom.lighting.brightness = 0.5
+        let store = ProfileStore(url: url)
+        try store.save(.init(selected: custom.id, custom: [custom]))
+        // Strip settings a previous version would not have written.
+        var text = try String(contentsOf: url, encoding: .utf8)
+        for key in ["blinkerPlayerLEDs", "fuelPlayerLEDs", "shiftRelease"] {
+            text = text.replacingOccurrences(of: #"\s*"\#(key)" : (true|false),?"#, with: "", options: .regularExpression)
+        }
+        XCTAssertFalse(text.contains("blinkerPlayerLEDs"))
+        try Data(text.utf8).write(to: url)
+        let loaded = store.load()
+        XCTAssertEqual(loaded.selected, custom.id)
+        XCTAssertEqual(loaded.custom.first?.name, "Mine")
+        XCTAssertEqual(loaded.custom.first?.brake.maxForce, 0.33)
+        XCTAssertEqual(loaded.custom.first?.lighting.brightness, 0.5)
+        XCTAssertEqual(loaded.custom.first?.lighting.fuelPlayerLEDs, true)   // default filled in
+    }
+
     func testHardBrakingBeatsBodyRoll() {
         var e = EffectEngine()
         _ = e.step(driving { $0.speed = 20 }, profile: .original, now: 0)

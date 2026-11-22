@@ -13,7 +13,7 @@ ETS2 1.62.3.3s from Steam.
 - SwiftUI app: Dashboard, Adaptive Triggers, Haptics, Lighting, Profiles, Game Setup, Diagnostics, menu bar item.
 - Packaging: `.app` bundle with the plugin inside, DMG, ad-hoc signature.
 - App icon and release DMG.
-- 38 automated tests (`make test`), all passing.
+- 40 automated tests (`make test`), all passing.
 
 ## Verified, with evidence
 

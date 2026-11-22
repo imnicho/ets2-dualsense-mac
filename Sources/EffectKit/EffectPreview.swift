@@ -67,7 +67,11 @@ public enum EffectPreview: String, CaseIterable, Sendable {
         case .hazard:
             t.blinkerLeftOn = Int(e * 2.5) % 2 == 0; t.blinkerRightOn = t.blinkerLeftOn; t.hazardWarning = true
         case .blinker:
-            t.blinkerLeftOn = Int(e * 2.5) % 2 == 0
+            // left for the first half, right for the second
+            let left = e < duration / 2
+            t.blinkerLeftActive = left; t.blinkerRightActive = !left
+            t.blinkerLeftOn = left && Int(e * 2.5) % 2 == 0
+            t.blinkerRightOn = !left && Int(e * 2.5) % 2 == 0
         case .lowFuel:
             t.fuel = 80; t.fuelWarning = true
         case .damage:

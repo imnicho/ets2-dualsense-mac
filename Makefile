@@ -1,4 +1,4 @@
-VERSION := 0.1.1
+VERSION := 0.1.2
 APP := build/ETS2 DualSense.app
 PLUGIN := build/ets2_dualsense.dylib
 DMG := build/ETS2-DualSense-$(VERSION).dmg

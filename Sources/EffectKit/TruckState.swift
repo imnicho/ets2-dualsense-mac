@@ -18,6 +18,8 @@ public struct TruckState: Codable, Equatable, Sendable {
     public var batteryVoltageWarning = false
     public var blinkerLeftOn = false
     public var blinkerRightOn = false
+    public var blinkerLeftActive = false    // stalk position (steady), as opposed to the flashing lamp
+    public var blinkerRightActive = false
     public var hazardWarning = false
     public var lightBrake = false
     public var lightReverse = false
@@ -98,6 +100,8 @@ extension TruckState {
         batteryVoltageWarning = t.batteryVoltageWarning != 0
         blinkerLeftOn = t.blinkerLeftOn != 0
         blinkerRightOn = t.blinkerRightOn != 0
+        blinkerLeftActive = t.blinkerLeftActive != 0
+        blinkerRightActive = t.blinkerRightActive != 0
         hazardWarning = t.hazardWarning != 0
         lightBrake = t.lightBrake != 0
         lightReverse = t.lightReverse != 0

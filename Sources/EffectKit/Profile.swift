@@ -144,6 +144,7 @@ public struct LightingConfig: Codable, Equatable, Sendable {
     public var brightness = 1.0
 
     public var fuelPlayerLEDs = true
+    public var blinkerPlayerLEDs = false                          // left signal on the left LEDs, right on the right
     public var warningsMicLED = true
 
     public init() {}
@@ -203,6 +204,7 @@ extension Profile {
         p.haptics.engineStop = HapticEffect(true, 0.6)
         p.haptics.bodyRoll.intensity = 0.6
         p.lighting.lowFuel.enabled = true
+        p.lighting.blinkerPlayerLEDs = true
     }
 
     public static let immersive = builtin("Immersive", "00000000-0000-4000-8000-000000000003") { p in
@@ -219,6 +221,7 @@ extension Profile {
         p.haptics.warning = HapticEffect(true, 1)
         p.haptics.mix = .additive
         p.lighting.lowFuel.enabled = true; p.lighting.damage.enabled = true
+        p.lighting.blinkerPlayerLEDs = true
         p.lighting.braking.enabled = true; p.lighting.rpmGauge = true
     }
 
@@ -261,10 +264,24 @@ public final class ProfileStore {
     }
 
     public func load() -> Document {
-        if let data = try? Data(contentsOf: url), let doc = try? JSONDecoder().decode(Document.self, from: data) {
-            return doc
+        if let data = try? Data(contentsOf: url),
+           let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let selected = (object["selected"] as? String).flatMap(UUID.init(uuidString:)),
+           let custom = object["custom"] as? [Any] {
+            return Document(selected: selected, custom: custom.compactMap { try? Self.profile(fromJSON: $0) })
         }
         return Document(selected: Profile.original.id, custom: [])
+    }
+
+    /// Decodes a profile, filling any setting the file lacks with its default, so files written
+    /// by older versions keep loading.
+    static func profile(fromJSON object: Any) throws -> Profile {
+        let defaults = try JSONSerialization.jsonObject(with: encoder.encode(Profile(name: "")))
+        func merge(_ base: Any, _ over: Any) -> Any {
+            guard let b = base as? [String: Any], let o = over as? [String: Any] else { return over }
+            return b.merging(o) { merge($0, $1) }
+        }
+        return try JSONDecoder().decode(Profile.self, from: JSONSerialization.data(withJSONObject: merge(defaults, object)))
     }
 
     public func save(_ doc: Document) throws {
@@ -282,7 +299,7 @@ public final class ProfileStore {
 
     /// Imported profiles always become new custom profiles.
     public static func importProfile(_ data: Data) throws -> Profile {
-        var p = try JSONDecoder().decode(Profile.self, from: data)
+        var p = try profile(fromJSON: JSONSerialization.jsonObject(with: data))
         p.id = UUID()
         p.builtIn = false
         return p
