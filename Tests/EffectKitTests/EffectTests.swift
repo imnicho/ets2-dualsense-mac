@@ -223,6 +223,38 @@ final class EffectTests: XCTestCase {
         XCTAssertEqual(p.throttle.maxForce, Profile.realistic.throttle.maxForce)
     }
 
+    /// Peak rumble a Preview button produces for the given slider position.
+    func previewPeak(_ preview: EffectPreview, _ path: WritableKeyPath<HapticsConfig, HapticEffect>, intensity: Double) -> UInt8 {
+        var p = Profile.original
+        p.haptics[keyPath: path] = HapticEffect(true, intensity)
+        let profile = preview.enabling(in: p)
+        var e = EffectEngine()
+        var peak: UInt8 = 0
+        var t = 0.0
+        while t < preview.duration {
+            let o = e.step(preview.truck(at: t), profile: profile, now: 100 + t).output
+            peak = max(peak, o.rumbleLeft, o.rumbleRight)
+            t += EffectEngine.frameInterval
+        }
+        return peak
+    }
+
+    func testPreviewFollowsIntensitySlider() {
+        let cases: [(EffectPreview, WritableKeyPath<HapticsConfig, HapticEffect>)] = [
+            (.hardBraking, \.hardBraking), (.gearJolt, \.gearJolt), (.engineStart, \.engineStart), (.bodyRoll, \.bodyRoll),
+            (.refuel, \.refuel), (.fineAlert, \.fineAlert), (.collision, \.collision), (.roadSurface, \.roadSurface),
+        ]
+        for (preview, path) in cases {
+            let full = previewPeak(preview, path, intensity: 1)
+            let half = previewPeak(preview, path, intensity: 0.5)
+            let zero = previewPeak(preview, path, intensity: 0)
+            print("PREVIEW \(preview.rawValue): 100% -> \(full), 50% -> \(half), 0% -> \(zero)")
+            XCTAssertGreaterThan(full, 100, preview.rawValue)
+            XCTAssertLessThan(Int(half), Int(full) * 6 / 10, preview.rawValue)
+            XCTAssertEqual(zero, 0, preview.rawValue)
+        }
+    }
+
     func testCollisionFromDamageIncrease() {
         var e = EffectEngine()
         _ = e.step(driving(), profile: .immersive, now: 0)

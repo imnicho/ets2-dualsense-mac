@@ -88,7 +88,7 @@ public enum EffectPreview: String, CaseIterable, Sendable {
     /// The profile with this effect forced on, so a disabled effect can still be previewed.
     public func enabling(in profile: Profile) -> Profile {
         var p = profile
-        func on(_ e: inout HapticEffect) { e.enabled = true; if e.intensity <= 0 { e.intensity = 1 } }
+        func on(_ e: inout HapticEffect) { e.enabled = true }
         switch self {
         case .engineStart: on(&p.haptics.engineStart)
         case .gearJolt: on(&p.haptics.gearJolt)
