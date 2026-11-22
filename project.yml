@@ -1,0 +1,61 @@
+# Xcode project for team-signed builds: `DEVELOPMENT_TEAM=<your team id> xcodegen generate`.
+# Day-to-day development uses SwiftPM and the Makefile instead.
+name: ETS2DualSense
+options:
+  deploymentTarget:
+    macOS: "15.0"
+packages:
+  Kit:
+    path: .
+targetTemplates:
+  App:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/ETS2DualSense
+      - path: packaging/icon/AppIcon.icon
+      - path: LICENSE
+        buildPhase: resources
+      - path: build/ets2_dualsense.dylib
+        buildPhase:
+          copyFiles:
+            destination: resources
+        attributes: [CodeSignOnCopy]
+    dependencies:
+      - package: Kit
+        product: DualSenseKit
+      - package: Kit
+        product: EffectKit
+    info:
+      path: packaging/AppStore-Info.plist
+      properties:
+        CFBundleDisplayName: ETS2 DualSense
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.utilities
+        LSMultipleInstancesProhibited: true
+        ITSAppUsesNonExemptEncryption: false
+        NSHumanReadableCopyright: Noncommercial use. See LICENSE.
+    settings:
+      base:
+        PRODUCT_NAME: ETS2 DualSense
+        PRODUCT_MODULE_NAME: ETS2DualSenseApp
+        PRODUCT_BUNDLE_IDENTIFIER: wtf.nicho.ets2-dualsense
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: YES
+        SWIFT_VERSION: "5"
+        ARCHS: arm64
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+targets:
+  # Sandboxed build for App Store Connect / TestFlight.
+  ETS2DualSenseApp:
+    templates: [App]
+    settings:
+      base:
+        CODE_SIGN_ENTITLEMENTS: packaging/AppStore.entitlements
+  # Non-sandboxed build for Developer ID distribution (the DMG on the releases page).
+  ETS2DualSenseDirect:
+    templates: [App]

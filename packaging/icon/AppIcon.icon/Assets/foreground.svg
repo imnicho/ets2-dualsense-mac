@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <path fill="#FFFFFF" fill-rule="evenodd" d="M476 316 H684 Q716 316 732 344 L792 452 H828 Q860 452 860 484 V628 Q860 656 832 656 H476 Q448 656 448 628 V344 Q448 316 476 316 Z M606 368 H674 Q686 368 692 378 L734 452 H606 Z"/>
+  <path fill="#FFFFFF" d="M192 572 H424 V656 H192 Q164 656 164 628 V600 Q164 572 192 572 Z"/>
+  <path fill="#FFFFFF" d="M394 284 H410 Q422 284 422 296 V548 H382 V296 Q382 284 394 284 Z"/>
+  <path fill="#5AC8FA" fill-rule="evenodd" d="M252 628 a68 68 0 1 0 0.01 0 Z M252 670 a26 26 0 1 1 -0.01 0 Z"/>
+  <path fill="#5AC8FA" fill-rule="evenodd" d="M404 628 a68 68 0 1 0 0.01 0 Z M404 670 a26 26 0 1 1 -0.01 0 Z"/>
+  <path fill="#5AC8FA" fill-rule="evenodd" d="M744 628 a68 68 0 1 0 0.01 0 Z M744 670 a26 26 0 1 1 -0.01 0 Z"/>
+  <path fill="#5AC8FA" d="M214 812 H810 Q824 812 824 826 Q824 840 810 840 H214 Q200 840 200 826 Q200 812 214 812 Z"/>
+</svg>
